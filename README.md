@@ -1,4 +1,4 @@
-# pyshell
+# basic-shell
 
 Hello, world!
 
