@@ -19,3 +19,6 @@ here's the [wiki](https://github.com/gv-coder/ShnozOS/wiki/)
 
   * and this is currently in beta stages (still in development)
   so it may still produce error messages!
+
+
+## Documentation
