@@ -9,21 +9,24 @@ project at my [Github](https://github.com/potato-pack/basic-shell/)
 Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
 
 ## Remember
-  * it is only basic
+  * It is only basic
   so don't expect parallel processing
   or compiling or anything like that.
 
 
-  * this is not intended for industrial use.
+  * This is not intended for industrial use.
 
+  * Also I am still developing this, meaning that
+  somethings like the wiki are not currently implemented
 
-  * and this is currently in beta stages (still in development)
+  * And this is currently in beta stages (still in development)
   so it may still produce error messages!
 
 
 ## Basic Documentation
   First, install it.
   `pip install basic-shell`
+
   ```
   import basicshell
   shell = basicshell.Shell()
@@ -34,4 +37,4 @@ Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
   This is how you basically use the shell,
   there are more ways to use the shell, such as
   using pipes and specifying your own shell
-  command. This is all in the [wiki](https://github.com/potato-pack/basic-shell/wiki)
+  command in the `execute` function. This is all in the [wiki](https://github.com/potato-pack/basic-shell/wiki)
