@@ -3,7 +3,7 @@ IS_NOT, OF_TYPE, ERROR, QUOTE, INVALID_ENV_VAR, MISSING_ARG, FILE_EXISTS, \
 FILE_NOT_FOUND, DIR_NOT_FOUND, CANNOT_EDIT
 from tools.parser import Parse
 from hashlib import sha256
-from .version import *
+from ...version import *
 from shutil import rmtree
 from os import mkdir, remove, path, walk
 
