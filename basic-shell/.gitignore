@@ -2,6 +2,11 @@
 __pycache__
 *.py[cod]
 *$py.class
+
+# Custom Stuff
+datac.json
+dataj.json
+
 # C extensions
 *.so
 
