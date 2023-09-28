@@ -21,7 +21,7 @@ Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
   so it may still produce error messages!
 
 
-## Documentation
+## Basic Documentation
   First, install it.
   `pip install basic-shell`
   ```
@@ -30,3 +30,8 @@ Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
   while True:
     shell.execute()
   ```
+
+  This is how you basically use the shell,
+  there are more ways to use the shell, such as
+  using pipes and specifying your own shell
+  command. This is all in the [wiki](https://github.com/potato-pack/basic-shell/wiki)
