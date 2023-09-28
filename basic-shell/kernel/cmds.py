@@ -3,7 +3,8 @@ IS_NOT, OF_TYPE, ERROR, QUOTE, INVALID_ENV_VAR, MISSING_ARG, FILE_EXISTS, \
 FILE_NOT_FOUND, DIR_NOT_FOUND, CANNOT_EDIT
 from tools.parser import Parse
 from hashlib import sha256
-from ...version import *
+from . import utils
+import version
 from shutil import rmtree
 from os import mkdir, remove, path, walk
 
@@ -26,14 +27,14 @@ def cd(cmd_set_seq, instance):
                 if path.isdir(cd_into_back_p):
                     return f'{back_p}'
                 else:
-                    print(ERROR, DIR_NOT_FOUND, back_p+'.', 
+                    instance.pipe.stdout(ERROR, DIR_NOT_FOUND, back_p+'.', 
                     'Cannot cd into dir')
                     return instance.cd
             
             if path.isdir(p):
                 return f'{instance.cd}\\{cmd_set_seq[1]}'
             else:
-                print(ERROR, DIR_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1]+'.', 
+                instance.pipe.stdout(ERROR, DIR_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                 'Cannot cd into dir')
                 return instance.cd
         except IndexError:
@@ -68,11 +69,11 @@ def udateu(cmd_set_seq, instance):
 
 
 def ver(cmd_set_seq, instance):
-    print(version)
+    instance.pipe.stdout(version.version)
 
 
 def github(cmd_set_seq, instance):
-    print(github_link)
+    instance.pipe.stdout(version.github_link)
 
 
 def setenv(cmd_set_seq, instance):
@@ -86,9 +87,9 @@ def setenv(cmd_set_seq, instance):
                     d['env'][env_var_name] = val
                     instance._dump(d, instance.data_j)
             except KeyError:
-                print(ERROR, INVALID_ENV_VAR, QUOTE+env_var_name+QUOTE)
+                instance.pipe.stdout(ERROR, INVALID_ENV_VAR, QUOTE+env_var_name+QUOTE)
         except IndexError:
-            print(ERROR, 'No environment variable name and value not defined')
+            instance.pipe.stdout(ERROR, 'No environment variable name and value not defined')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -108,7 +109,7 @@ def mkenv(cmd_set_seq, instance):
                 d = instance.json
                 d['env'][env_var_name] = val
         except IndexError:
-            print(ERROR, 'No environment variable name and value not defined')
+            instance.pipe.stdout(ERROR, 'No environment variable name and value not defined')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -126,7 +127,7 @@ def dlenv(cmd_set_seq, instance):
                 env_var_name = cmd_set_seq[1]
                 del d['env'][env_var_name]
         except IndexError:
-            print(ERROR, 'No environment variable name and value not defined')
+            instance.pipe.stdout(ERROR, 'No environment variable name and value not defined')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -140,16 +141,16 @@ def new(cmd_set_seq, instance):
                     with open(p, 'x') as tempf:
                         pass
                 except FileExistsError:
-                    print(ERROR, FILE_EXISTS, instance.cd+'\\'+cmd_set_seq[1]+'.', 
+                    instance.pipe.stdout(ERROR, FILE_EXISTS, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                     'Cannot create new file')
             else:
                 p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     mkdir(p)
                 except FileExistsError:
-                    print(ERROR, FILE_EXISTS, p+'.', 'Cannot create new file')
+                    instance.pipe.stdout(ERROR, FILE_EXISTS, p+'.', 'Cannot create new file')
         except IndexError:
-            print(ERROR, MISSING_ARG, '1.', 'Cannot run new')
+            instance.pipe.stdout(ERROR, MISSING_ARG, '1.', 'Cannot run new')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -164,10 +165,10 @@ def dlete(cmd_set_seq, instance):
                 else:
                     rmtree(p, ignore_errors=True)
             except FileNotFoundError:
-                print(ERROR, FILE_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1], 
+                instance.pipe.stdout(ERROR, FILE_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1], 
                 'Cannot run dlete')
         except IndexError:
-            print(ERROR, MISSING_ARG, '1.', 'Cannot run dlete')
+            instance.pipe.stdout(ERROR, MISSING_ARG, '1.', 'Cannot run dlete')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -180,7 +181,7 @@ def edit(cmd_set_seq, instance):
                 try:
                     with open(p, 'w') as tempf:
                         lines = []
-                        print('-------- edit --------')
+                        instance.pipe.stdout('-------- edit --------')
                         while True:
                             line = input()
                             if line == '*done*':
@@ -190,46 +191,46 @@ def edit(cmd_set_seq, instance):
                         tempf.writelines(lines)
 
                 except FileNotFoundError:
-                    print(ERROR, FILE_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1]+'.', 
+                    instance.pipe.stdout(ERROR, FILE_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                     'Cannot edit file')
             else:
-                print(ERROR, CANNOT_EDIT, p, 'is a directory. Cannot edit')
+                instance.pipe.stdout(ERROR, CANNOT_EDIT, p, 'is a directory. Cannot edit')
         except IndexError:
-            print(ERROR, MISSING_ARG, '1.', 'Cannot run new')
+            instance.pipe.stdout(ERROR, MISSING_ARG, '1.', 'Cannot run new')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
 def help(cmd_set_seq, instance):
     try:
         if cmd_set_seq[1] in cmds:
-            print('Find help here:', github_link+'/wiki/'+'Commands/')
+            instance.pipe.stdout('Find help here:', version.github_link+'/wiki/'+'Commands/')
     except:
-        print(ERROR, MISSING_ARG)
+        instance.pipe.stdout(ERROR, MISSING_ARG)
 
 
 def arth(cmd_set_seq, instance):
     try:
         if cmd_set_seq[2] == '+':
-            print(int(cmd_set_seq[1])+int(cmd_set_seq[3]))
+            instance.pipe.stdout(int(cmd_set_seq[1])+int(cmd_set_seq[3]))
     except Exception as e:
-        print(e)
+        instance.pipe.stdout(e)
 
 
 def lidir(cmd_set_seq, instance):
     if instance.cd:
         try:
             p = 'centrl\\'+instance.cd+'\\'
-            print(f'Inside {p}')
+            instance.pipe.stdout(f'Inside {p}')
             for root, dirs, files in walk(p, topdown=False):
                 for name in files:
-                    print(f'{p}\\{name}')
+                    instance.pipe.stdout(f'{p}\\{name}')
                 for name in dirs:
-                    print(f'{p}\\{name}')
+                    instance.pipe.stdout(f'{p}\\{name}')
                     for root2, dirs2, files2 in walk(f'{p}\\{name}', topdown=True):
                         for fname in files2:
-                            print(f'{p}\\{name}\\{fname}')
+                            instance.pipe.stdout(f'{p}\\{name}\\{fname}')
         except IndexError:
-            print(ERROR, MISSING_ARG, '1.', 'Cannot run new')
+            instance.pipe.stdout(ERROR, MISSING_ARG, '1.', 'Cannot run new')
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
@@ -240,7 +241,7 @@ def ensure_password_is_right(instance):
     while getting_password:
         pss = input('Password: ')
         if not sha256(pss.encode()).hexdigest() == json['user']['password']:
-            print('Wrong password')
+            instance.pipe.stdout('Wrong password')
             continue
         else:
             getting_password = False

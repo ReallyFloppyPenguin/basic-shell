@@ -1,12 +1,5 @@
 from setuptools import setup, find_packages
 from version import version
-import codecs
-import os
-
-here = os.path.abspath(os.path.dirname(__file__))
-
-with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
-    long_description = "\n" + fh.read()
 
 VERSION = version
 DESCRIPTION = "A simple python-built shell"
@@ -19,13 +12,23 @@ setup(
     author="PotatoPack (Gurvaah Singh)",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     packages=find_packages(),
-    install_requires=["hashlib", "shutil", "os", "typing", "subprocess", "json"],
+    install_requires=[
+        "hashlib",
+        "shutil",
+        "os",
+        "typing",
+        "subprocess",
+        "json",
+        "click",
+        "pyttsx3",
+        "colourama",
+    ],
     keywords=["python", "shell", "basic"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3"
+        "Programming Language :: Python :: 3",
     ],
 )

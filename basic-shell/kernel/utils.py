@@ -1,11 +1,16 @@
+import sys
+sys.path.append(".")
 from hashlib import sha256
 from json import load as l, dump as d
 from tools.parser import Parse
 from .cmds import *
 from tools.error import ERROR, INVALID_CMD, QUOTE
 from subprocess import Popen, PIPE
-from typing import Optional, List
+from typing import Optional, List, TypeVar
+from tools import pipes
 
+
+DefaultPipe = type(pipes.BasePipe)
 
 def call_cmd(cmd: str) -> Optional[List[str]]:
     try:
@@ -19,7 +24,8 @@ def call_cmd(cmd: str) -> Optional[List[str]]:
 
 class Shell:
     def __init__(
-        self, data_j: str = "data_j.json", data_c: str = "data_j.json"
+        self, pipe, data_j: str = "data_j.json", data_c: str = "data_j.json",
+        
     ) -> None:
         """
         This is the main part, or code that is in this package\n
@@ -39,6 +45,13 @@ class Shell:
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
         self.call = self._load(self.data_c)
+        
+        
+        if isinstance(pipe, pipes.BasePipe):
+            self.pipe = pipe
+            
+        else:
+            raise pipes.PipeError(f'Pipe must be of type BasePipe, not {pipe.__class__.__name__}')
         try:
             if not self.json["user"]["username"]:
                 self._create_user()
@@ -122,9 +135,8 @@ class Shell:
             cmd = self._query_call(cmd_set_seq)
             if cmd:
                 call_cmd(cmd[1])
-            print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
-        else:
-            print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
+            else:
+                print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
 
         self.reload(self.cd)
 
