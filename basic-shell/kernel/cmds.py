@@ -1,13 +1,12 @@
-from tools.error import ShellInstanceError, FATAL_ERR, SHELL, \
-IS_NOT, OF_TYPE, ERROR, QUOTE, INVALID_ENV_VAR, MISSING_ARG, FILE_EXISTS, \
-FILE_NOT_FOUND, DIR_NOT_FOUND, CANNOT_EDIT
+from tools.error import *
 from tools.parser import Parse
 from hashlib import sha256
-from . import utils
+from kernel import utils
 import version
 from shutil import rmtree
-from os import mkdir, remove, path, walk
-
+from os import mkdir, remove, path, walk, getcwd
+import os
+from pathlib import Path
 cmds = [
     'cd', 'rsetu', 'quit', 'udateu', 'github', 'ver', 'setenv', 'mkenv',
     'dlenv', 'help', 'arth', 'new', 'dlete', 'edit', 'lidir'
@@ -17,10 +16,10 @@ def cd(cmd_set_seq, instance):
     """`instance` must be of type Shell"""
     if instance.cd:
         try:
-            p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
+            p =  version.path+instance.cd+'\\'+cmd_set_seq[1]
             if cmd_set_seq[1] == '../':
                 back_p = Parse().parse(instance.cd, sep='\\')[0]
-                cd_into_back_p = 'centrl\\'+back_p
+                cd_into_back_p = version.path+back_p
                 if not back_p:
                     return instance.cd
                     
@@ -102,12 +101,14 @@ def mkenv(cmd_set_seq, instance):
                 val = cmd_set_seq[2]
                 d = instance.json
                 d['env'][env_var_name] = val
+                
             except KeyError:
                 d['env'] = {}
                 env_var_name = cmd_set_seq[1]
                 val = cmd_set_seq[2]
                 d = instance.json
                 d['env'][env_var_name] = val
+            instance._dump(d, instance.data_j)
         except IndexError:
             instance.pipe.stdout(ERROR, 'No environment variable name and value not defined')
     else:
@@ -135,7 +136,7 @@ def dlenv(cmd_set_seq, instance):
 def new(cmd_set_seq, instance):
     if instance.cd:
         try:
-            if path.splitext(cmd_set_seq[1])[1]:
+            if len(path.splitext(cmd_set_seq[1])[1]) >= 1:
                 p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     with open(p, 'x') as tempf:
@@ -144,9 +145,9 @@ def new(cmd_set_seq, instance):
                     instance.pipe.stdout(ERROR, FILE_EXISTS, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                     'Cannot create new file')
             else:
-                p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
+                p = getcwd()+'\\basic-shell\\centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
                 try:
-                    mkdir(p)
+                    Path(p).mkdir()
                 except FileExistsError:
                     instance.pipe.stdout(ERROR, FILE_EXISTS, p+'.', 'Cannot create new file')
         except IndexError:

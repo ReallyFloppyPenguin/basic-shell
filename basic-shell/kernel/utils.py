@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 from hashlib import sha256
 from json import load as l, dump as d
@@ -12,20 +13,23 @@ from tools import pipes
 
 DefaultPipe = type(pipes.BasePipe)
 
+
 def call_cmd(cmd: str) -> Optional[List[str]]:
     try:
         process = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         return stdout, stderr
     except FileNotFoundError:
-        print(cmd)
+        print(cmd, "isanerr")
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
 
 
 class Shell:
     def __init__(
-        self, pipe, data_j: str = "data_j.json", data_c: str = "data_j.json",
-        
+        self,
+        pipe,
+        data_j: str = "data_j.json",
+        data_c: str = "data_c.json",
     ) -> None:
         """
         This is the main part, or code that is in this package\n
@@ -40,18 +44,18 @@ class Shell:
         If you want a better documentation, head over \n
         to my [GitHub](https://github.com/potato-pack/basic-shell/tree/main#documentation) README
         """
+        if isinstance(pipe, pipes.BasePipe):
+            self.pipe = pipe
+        else:
+            raise pipes.PipeError(
+                f"Pipe must be of type BasePipe, not {pipe.__class__.__name__}"
+            )
         self.cd: str = "root"
         self.data_j: str = data_j
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
         self.call = self._load(self.data_c)
-        
-        
-        if isinstance(pipe, pipes.BasePipe):
-            self.pipe = pipe
-            
-        else:
-            raise pipes.PipeError(f'Pipe must be of type BasePipe, not {pipe.__class__.__name__}')
+
         try:
             if not self.json["user"]["username"]:
                 self._create_user()
@@ -82,7 +86,7 @@ class Shell:
         self._handle(inp)
 
     def _handle(self, inp):
-        cmd_set_seq = Parse().parse(inp)
+        cmd_set_seq = Parse().parse(inp.strip())
         if cmd_set_seq[0] == "cd":
             # Use the cd func from centrl
             c_d = cd(cmd_set_seq, self)
@@ -133,7 +137,8 @@ class Shell:
         if not cmd_set_seq[0] in cmds:
             # Cmd not listed so create error
             cmd = self._query_call(cmd_set_seq)
-            if cmd:
+            print(cmd)
+            if cmd is not None:
                 call_cmd(cmd[1])
             else:
                 print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
@@ -184,10 +189,20 @@ class Shell:
         }
         ```
         """
-        for cmd in self.call["cmds"][0]:
-            if cmd_set_seq == cmd:
-                return [cmd[0], cmd[1]]
-        return None
+        has_found_command = False
+        for cmd in self.call["cmds"]:
+            print(self.call["cmds"])
+            if cmd_set_seq == cmd[0]:
+                print(cmd)
+                print(cmd == cmd_set_seq)
+                has_found_command = True
+                try:
+                    return [cmd[0], cmd[1], cmd[2]]
+                except:
+                    return [cmd[0], cmd[1]]
+        if has_found_command == False:
+            print("nah")
+            return None
 
     def __delattr__(self, __name: str) -> None:
         self.reload(self.cd)

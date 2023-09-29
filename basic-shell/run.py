@@ -1,11 +1,9 @@
-
 from kernel.utils import Shell
-from tools.pipes import SpeakPipe
-
+from tools.pipes import DefaultPipe, SpeakPipe, ColourPipe, Fore
 
 
 if __name__ == "__main__":
-    pipe = SpeakPipe()
-    shell = Shell(pipe,"datac.json", "dataj.json")
+    pipe = DefaultPipe()
+    shell = Shell(pipe)
     while True:
         shell.execute()
