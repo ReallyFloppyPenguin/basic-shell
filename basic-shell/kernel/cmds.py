@@ -1,8 +1,8 @@
-from tools.error import *
-from tools.parser import Parse
+from ..tools.error import *
+from ..tools.parser import Parse
 from hashlib import sha256
-from kernel import utils
-import version
+from ..kernel import utils
+from . import version
 from shutil import rmtree
 from os import mkdir, remove, path, walk, getcwd
 import os

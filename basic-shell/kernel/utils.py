@@ -3,12 +3,12 @@ import sys
 sys.path.append(".")
 from hashlib import sha256
 from json import load as l, dump as d
-from tools.parser import Parse
+from ..tools.parser import Parse
 from .cmds import *
-from tools.error import ERROR, INVALID_CMD, QUOTE
+from ..tools.error import ERROR, INVALID_CMD, QUOTE
 from subprocess import Popen, PIPE
 from typing import Optional, List, TypeVar
-from tools import pipes
+from ..tools import pipes
 
 
 def call_cmd(instance, cmd: str, is_special: bool = False) -> Optional[List[str]]:
