@@ -8,7 +8,8 @@ class BasePipe:
     def __init__(self):...
 
     def stdout(self, *out) -> None:
-        out = ' '.join(out)
+        if not isinstance(out, list):
+            out = ' '.join(out)
         print(out)
 
 class DefaultPipe(BasePipe):

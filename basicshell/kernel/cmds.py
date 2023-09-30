@@ -137,7 +137,7 @@ def new(cmd_set_seq, instance):
     if instance.cd:
         try:
             if len(path.splitext(cmd_set_seq[1])[1]) >= 1:
-                p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
+                p = version.path+instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     with open(p, 'x') as tempf:
                         pass
@@ -145,7 +145,7 @@ def new(cmd_set_seq, instance):
                     instance.pipe.stdout(ERROR, FILE_EXISTS, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                     'Cannot create new file')
             else:
-                p = getcwd()+'\\basic-shell\\centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
+                p = version.path+instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     Path(p).mkdir()
                 except FileExistsError:
@@ -176,9 +176,8 @@ def dlete(cmd_set_seq, instance):
 def edit(cmd_set_seq, instance):
     if instance.cd:
         try:
-            p = 'centrl\\'+instance.cd+'\\'+cmd_set_seq[1]
+            p = version.path+instance.cd+'\\'+cmd_set_seq[1]
             if path.splitext(cmd_set_seq[1])[1]:
-                
                 try:
                     with open(p, 'w') as tempf:
                         lines = []
@@ -216,11 +215,16 @@ def arth(cmd_set_seq, instance):
     except Exception as e:
         instance.pipe.stdout(e)
 
-
 def lidir(cmd_set_seq, instance):
+    p = version.path+instance.cd+'\\'
+    instance.pipe.stdout(f'Inside {p}')
+    for file in os.listdir(p):
+        instance.pipe.stdout('--'+file, 'is-dir', str(os.path.isdir(os.path.abspath(p))))
+
+def _lidir(cmd_set_seq, instance):
     if instance.cd:
         try:
-            p = 'centrl\\'+instance.cd+'\\'
+            p = version.path+instance.cd+'\\'
             instance.pipe.stdout(f'Inside {p}')
             for root, dirs, files in walk(p, topdown=False):
                 for name in files:

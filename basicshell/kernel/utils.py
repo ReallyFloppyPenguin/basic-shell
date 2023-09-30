@@ -9,17 +9,30 @@ from typing import Optional, List, TypeVar
 from ..tools import pipes
 
 
-def call_cmd(instance, cmd: str, is_special: bool = False) -> Optional[List[str]]:
+def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
     try:
+        print(f'Running {cmds[1]} as SPECIAL')
+
+        try:
+            is_special = cmds[2]
+        except IndexError:
+            is_special = False
+        
+        modified_cmd_list = []
+        for i in range(1, len(cmds)):
+            print('replace', i)
+            modified_cmd_list.append(cmds[1].replace(f'*{i}*', f'*{cmd_set_seq[i]}*'))
+        cmd = ' '.join(modified_cmd_list)
+
         if is_special:
-            os.system(cmd)
+            os.system(cmd[0])
             return "-----Special-----", "-----Special-----"
         else:
             process = Popen(cmd, stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
             return stdout, stderr
+        
     except FileNotFoundError:
-        print(cmd, "isanerr")
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
 
 
@@ -136,9 +149,8 @@ class Shell:
         if not cmd_set_seq[0] in cmds:
             # Cmd not listed so create error
             cmd = self._query_call(cmd_set_seq)
-            print(cmd)
             if cmd is not None:
-                out, err = call_cmd(self, cmd[1], cmd[2])
+                out, err = call_cmd(cmd_set_seq, self, cmd)
                 if out:
                     print('OUTPUT', '\n', out)
                 else:
@@ -195,17 +207,18 @@ class Shell:
         has_found_command = False
         for cmd in self.call["cmds"]:
             print(self.call["cmds"])
-            if cmd_set_seq == cmd[0]:
+            print(cmd_set_seq[0], cmd[0])
+            if cmd_set_seq[0] == cmd[0][0]:
                 print(cmd)
                 print(cmd == cmd_set_seq)
-                has_found_command = True
+                #has_found_command = True
                 try:
                     return [cmd[0], cmd[1], cmd[2]]
                 except:
                     return [cmd[0], cmd[1], False]
-        if has_found_command == False:
-            print("nah")
-            return None
+        #if has_found_command == False:
+        ##    print("nah")
+        #    return None
 
     def __delattr__(self, __name: str) -> None:
         self.reload(self.cd)
