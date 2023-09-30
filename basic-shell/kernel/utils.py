@@ -1,6 +1,4 @@
-import sys
 
-sys.path.append(".")
 from hashlib import sha256
 from json import load as l, dump as d
 from ..tools.parser import Parse
