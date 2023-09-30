@@ -11,14 +11,15 @@ from typing import Optional, List, TypeVar
 from tools import pipes
 
 
-DefaultPipe = type(pipes.BasePipe)
-
-
-def call_cmd(cmd: str) -> Optional[List[str]]:
+def call_cmd(instance, cmd: str, is_special: bool = False) -> Optional[List[str]]:
     try:
-        process = Popen(cmd, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = process.communicate()
-        return stdout, stderr
+        if is_special:
+            os.system(cmd)
+            return "-----Special-----", "-----Special-----"
+        else:
+            process = Popen(cmd, stdout=PIPE, stderr=PIPE)
+            stdout, stderr = process.communicate()
+            return stdout, stderr
     except FileNotFoundError:
         print(cmd, "isanerr")
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
@@ -139,7 +140,11 @@ class Shell:
             cmd = self._query_call(cmd_set_seq)
             print(cmd)
             if cmd is not None:
-                call_cmd(cmd[1])
+                out, err = call_cmd(self, cmd[1], cmd[2])
+                if out:
+                    print('OUTPUT', '\n', out)
+                else:
+                    print('ERROR', '\n', err)
             else:
                 print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
 
@@ -184,7 +189,7 @@ class Shell:
         ```
         cmds: {
             [
-               [['<your-activator>'], '<your-command>']
+               [['<your-activator>'], '<your-command>', <is-special>]
             ]
         }
         ```
@@ -199,7 +204,7 @@ class Shell:
                 try:
                     return [cmd[0], cmd[1], cmd[2]]
                 except:
-                    return [cmd[0], cmd[1]]
+                    return [cmd[0], cmd[1], False]
         if has_found_command == False:
             print("nah")
             return None
