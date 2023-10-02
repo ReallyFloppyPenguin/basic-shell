@@ -1,4 +1,3 @@
-
 from hashlib import sha256
 from json import load as l, dump as d
 from ..tools.parser import Parse
@@ -11,27 +10,31 @@ from ..tools import pipes
 
 def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
     try:
-        print(f'Running {cmds[1]} as SPECIAL')
+        print(f"Running {cmds[1]} as SPECIAL")
 
         try:
             is_special = cmds[2]
         except IndexError:
             is_special = False
-        
+
         modified_cmd_list = []
-        for i in range(1, len(cmds)):
-            print('replace', i)
-            modified_cmd_list.append(cmds[1].replace(f'*{i}*', f'*{cmd_set_seq[i]}*'))
-        cmd = ' '.join(modified_cmd_list)
+        #print("----------------------------------------------------------------")
+        #print(1, len(cmds))
+
+        for i in range(1, len(cmd_set_seq)):
+            #print("replace", i)
+            #print(cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}'))
+            modified_cmd_list.append(cmds[1].replace(f"*{i}*", f"*{cmd_set_seq[i]}*"))
+        cmd = "".join(modified_cmd_list)
 
         if is_special:
-            os.system(cmd[0])
+            os.system(cmd)
             return "-----Special-----", "-----Special-----"
         else:
             process = Popen(cmd, stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
             return stdout, stderr
-        
+
     except FileNotFoundError:
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
 
@@ -67,7 +70,22 @@ class Shell:
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
         self.call = self._load(self.data_c)
-
+        self.cmds_to_call_default_set = {
+            "cd": cd,
+            "lidir": lidir,
+            "new": new,
+            "mkenv": mkenv,
+            "setenv": setenv,
+            "udateu": udateu,
+            "rsetu": rsetu,
+            "dlenv": dlenv,
+            "ver": ver,
+            "github": github,
+            "quit": quit,
+            "help": help,
+            "edit": edit,
+            "arth": arth,
+        }
         try:
             if not self.json["user"]["username"]:
                 self._create_user()
@@ -99,6 +117,23 @@ class Shell:
 
     def _handle(self, inp):
         cmd_set_seq = Parse().parse(inp.strip())
+        call = self.cmds_to_call_default_set.get(cmd_set_seq[0])
+        if call:
+            if cmd_set_seq[0] == 'cd':
+                c_d = call(cmd_set_seq, self)
+                self.reload(c_d)
+        else:
+            cmd = self._query_call(cmd_set_seq)
+            if cmd is not None:
+                out, err = call_cmd(cmd_set_seq, self, cmd)
+                if out:
+                    print("OUTPUT", "\n", out)
+                else:
+                    print("ERROR", "\n", err)
+            else:
+                print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
+
+        self.reload(self.cd)
         if cmd_set_seq[0] == "cd":
             # Use the cd func from centrl
             c_d = cd(cmd_set_seq, self)
@@ -152,9 +187,9 @@ class Shell:
             if cmd is not None:
                 out, err = call_cmd(cmd_set_seq, self, cmd)
                 if out:
-                    print('OUTPUT', '\n', out)
+                    print("OUTPUT", "\n", out)
                 else:
-                    print('ERROR', '\n', err)
+                    print("ERROR", "\n", err)
             else:
                 print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
 
@@ -211,12 +246,12 @@ class Shell:
             if cmd_set_seq[0] == cmd[0][0]:
                 print(cmd)
                 print(cmd == cmd_set_seq)
-                #has_found_command = True
+                # has_found_command = True
                 try:
                     return [cmd[0], cmd[1], cmd[2]]
                 except:
                     return [cmd[0], cmd[1], False]
-        #if has_found_command == False:
+        # if has_found_command == False:
         ##    print("nah")
         #    return None
 
