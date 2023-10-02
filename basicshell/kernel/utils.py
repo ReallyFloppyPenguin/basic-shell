@@ -24,9 +24,11 @@ def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
         for i in range(1, len(cmd_set_seq)):
             #print("replace", i)
             #print(cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}'))
-            modified_cmd_list.append(cmds[1].replace(f"*{i}*", f"*{cmd_set_seq[i]}*"))
+            modified_cmd_list.append(
+                cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}')
+            )
         cmd = "".join(modified_cmd_list)
-
+        print(cmd)
         if is_special:
             os.system(cmd)
             return "-----Special-----", "-----Special-----"
@@ -81,7 +83,7 @@ class Shell:
             "dlenv": dlenv,
             "ver": ver,
             "github": github,
-            "quit": quit,
+            "quit": stop,
             "help": help,
             "edit": edit,
             "arth": arth,
@@ -117,11 +119,15 @@ class Shell:
 
     def _handle(self, inp):
         cmd_set_seq = Parse().parse(inp.strip())
+        print(cmd_set_seq[0])
         call = self.cmds_to_call_default_set.get(cmd_set_seq[0])
-        if call:
+        if call is not None:
+            print('oj')
             if cmd_set_seq[0] == 'cd':
                 c_d = call(cmd_set_seq, self)
                 self.reload(c_d)
+            else:
+                call(cmd_set_seq, self)
         else:
             cmd = self._query_call(cmd_set_seq)
             if cmd is not None:
@@ -134,66 +140,7 @@ class Shell:
                 print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
 
         self.reload(self.cd)
-        if cmd_set_seq[0] == "cd":
-            # Use the cd func from centrl
-            c_d = cd(cmd_set_seq, self)
-            self.reload(c_d)
-
-        if cmd_set_seq[0] == "rsetu":
-            rsetu(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "udateu":
-            udateu(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "quit":
-            quit()
-
-        if cmd_set_seq[0] == "ver":
-            ver(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "github":
-            github(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "help":
-            help(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "setenv":
-            setenv(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "mkenv":
-            mkenv(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "dlenv":
-            dlenv(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "new":
-            new(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "dlete":
-            dlete(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "lidir":
-            lidir(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "edit":
-            edit(cmd_set_seq, self)
-
-        if cmd_set_seq[0] == "arth":
-            arth(cmd_set_seq, self)
-
-        if not cmd_set_seq[0] in cmds:
-            # Cmd not listed so create error
-            cmd = self._query_call(cmd_set_seq)
-            if cmd is not None:
-                out, err = call_cmd(cmd_set_seq, self, cmd)
-                if out:
-                    print("OUTPUT", "\n", out)
-                else:
-                    print("ERROR", "\n", err)
-            else:
-                print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
-
-        self.reload(self.cd)
+        
 
     def _load(self, path: str, rebuild: bool = True):
         try:
@@ -241,11 +188,7 @@ class Shell:
         """
         has_found_command = False
         for cmd in self.call["cmds"]:
-            print(self.call["cmds"])
-            print(cmd_set_seq[0], cmd[0])
             if cmd_set_seq[0] == cmd[0][0]:
-                print(cmd)
-                print(cmd == cmd_set_seq)
                 # has_found_command = True
                 try:
                     return [cmd[0], cmd[1], cmd[2]]

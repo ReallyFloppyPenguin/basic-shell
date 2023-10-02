@@ -8,9 +8,12 @@ from os import mkdir, remove, path, walk, getcwd
 import os
 from pathlib import Path
 cmds = [
-    'cd', 'rsetu', 'quit', 'udateu', 'github', 'ver', 'setenv', 'mkenv',
+    'cd', 'rsetu', 'stop', 'udateu', 'github', 'ver', 'setenv', 'mkenv',
     'dlenv', 'help', 'arth', 'new', 'dlete', 'edit', 'lidir'
 ]
+
+def stop(cmd_set_seq, instance):
+    quit()
 
 def cd(cmd_set_seq, instance):
     """`instance` must be of type Shell"""
