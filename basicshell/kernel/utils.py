@@ -25,15 +25,16 @@ def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
             modified_cmd_list.append(
                 cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}')
             )
+        if len(modified_cmd_list) == 0:
+            modified_cmd_list.append(cmds[1])
         cmd = "".join(modified_cmd_list)
-        print(cmd)
         if is_special:
             os.system(cmd)
             return "-----Special-----", "-----Special-----"
         else:
             process = Popen(cmd, stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
-            return stdout, stderr
+            return stdout.decode(), stderr.decode()
 
     except FileNotFoundError:
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
