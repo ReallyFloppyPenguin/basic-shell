@@ -7,6 +7,7 @@ from shutil import rmtree
 from os import mkdir, remove, path, walk, getcwd
 import os
 from pathlib import Path
+from basicshell.tools import text_editor
 cmds = [
     'cd', 'rsetu', 'stop', 'udateu', 'github', 'ver', 'setenv', 'mkenv',
     'dlenv', 'help', 'arth', 'new', 'dlete', 'edit', 'lidir'
@@ -176,7 +177,12 @@ def dlete(cmd_set_seq, instance):
     else:
         raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
 
+
 def edit(cmd_set_seq, instance):
+    print(cmd_set_seq[1])
+    text_editor.run(path=cmd_set_seq[1])
+
+def _edit(cmd_set_seq, instance):
     if instance.cd:
         try:
             p = version.path+instance.cd+'\\'+cmd_set_seq[1]
@@ -222,7 +228,7 @@ def lidir(cmd_set_seq, instance):
     p = version.path+instance.cd+'\\'
     instance.pipe.stdout(f'Inside {p}')
     for file in os.listdir(p):
-        instance.pipe.stdout('--'+file, 'is-dir', str(os.path.isdir(os.path.abspath(p))))
+        instance.pipe.stdout('--'+file)
 
 def _lidir(cmd_set_seq, instance):
     if instance.cd:
