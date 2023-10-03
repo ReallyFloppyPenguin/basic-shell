@@ -6,6 +6,7 @@ import version
 from shutil import rmtree
 from os import mkdir, remove, path, walk, getcwd
 import os
+import platform
 from pathlib import Path
 from basicshell.tools import text_editor
 cmds = [
@@ -217,6 +218,11 @@ def help(cmd_set_seq, instance):
     except:
         instance.pipe.stdout(ERROR, MISSING_ARG)
 
+def clear(cmd_set_seq, instance):
+    if platform.uname().system == 'Windows':
+        os.system('cls')
+    else:
+        instance.pipe.stdout(f'System ({platform.uname().system}) is not supported yet')
 
 def arth(cmd_set_seq, instance):
     try:

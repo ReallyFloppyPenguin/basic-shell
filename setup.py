@@ -24,6 +24,8 @@ setup(
         "click",
         "pyttsx3",
         "colourama",
+        "platform",
+        "prompt_toolkit"
     ],
     keywords=["python", "shell", "basic"],
     classifiers=[

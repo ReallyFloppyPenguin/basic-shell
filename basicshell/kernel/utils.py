@@ -86,6 +86,7 @@ class Shell:
             "help": help,
             "edit": edit,
             "arth": arth,
+            "clear": clear
         }
         try:
             if not self.json["user"]["username"]:
@@ -96,6 +97,7 @@ class Shell:
         self._passw = self.json["user"]["password"]
         self.inp_start = f"{self._username}@{self.cd}$ "
         self._jp = data_j.encode("utf-8")
+        clear([], self)
 
     def _create_user(self):
         print("Please fill this form to create a user")
