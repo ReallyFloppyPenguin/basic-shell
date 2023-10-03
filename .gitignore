@@ -6,6 +6,7 @@
 
 # Custom Stuff
 __init__.py
+basicshell/centrl/root
 *.json
 
 # C extensions
