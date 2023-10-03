@@ -10,8 +10,6 @@ from ..tools import pipes
 
 def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
     try:
-        print(f"Running {cmds[1]} as SPECIAL")
-
         try:
             is_special = cmds[2]
         except IndexError:
