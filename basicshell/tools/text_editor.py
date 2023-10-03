@@ -368,6 +368,9 @@ class TextEditor:
             with open(path, "r") as f:
                 self.text_field.text = f.read()
         self.application.run()
+        if os.path.isfile(path):
+            with open(path, "w") as f:
+                f.write(self.text_field.text)
 
 
 # Global key bindings.

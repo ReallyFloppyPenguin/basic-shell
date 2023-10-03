@@ -19,6 +19,8 @@ Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
   * Also I am still developing this, meaning that
   somethings like the wiki are not currently implemented
 
+  * There are also some (big) bugs!
+
   * And this is currently in beta stages (still in development)
   so it may still produce error messages!
 
