@@ -179,8 +179,9 @@ def dlete(cmd_set_seq, instance):
 
 
 def edit(cmd_set_seq, instance):
+    text_ed = text_editor.TextEditor()
     print(cmd_set_seq[1])
-    text_editor.run(path=cmd_set_seq[1])
+    text_ed.run(path=cmd_set_seq[1])
 
 def _edit(cmd_set_seq, instance):
     if instance.cd:
