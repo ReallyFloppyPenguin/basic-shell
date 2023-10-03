@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 """
 A simple example of a Notepad-like text editor.
@@ -37,46 +36,26 @@ from prompt_toolkit.widgets import (
     TextArea,
 )
 
-    
 
-class ApplicationState:
-    """
-    Application state.
+class MessageDialog:
+    def __init__(self, title, text):
+        self.future = Future()
 
-    For the simplicity, we store this as a global, but better would be to
-    instantiate this as an object and pass at around.
-    """
+        def set_done():
+            self.future.set_result(None)
 
-    show_status_bar = True
-    current_path = None
+        ok_button = Button(text="OK", handler=(lambda: set_done()))
 
-
-class TextEditor:
-    def __init__(self) -> None:
-        pass
-
-def get_statusbar_text():
-    return " Press Ctrl-C to open menu; Ctrl-T to exit"
-
-
-def get_statusbar_right_text():
-    return " {}:{}  ".format(
-        text_field.document.cursor_position_row + 1,
-        text_field.document.cursor_position_col + 1,
-    )
-
-
-search_toolbar = SearchToolbar()
-text_field = TextArea(
-    lexer=DynamicLexer(
-        lambda: PygmentsLexer.from_filename(
-            ApplicationState.current_path or ".txt", sync_from_start=False
+        self.dialog = Dialog(
+            title=title,
+            body=HSplit([Label(text=text)]),
+            buttons=[ok_button],
+            width=D(preferred=80),
+            modal=True,
         )
-    ),
-    scrollbar=True,
-    line_numbers=True,
-    search_field=search_toolbar,
-)
+
+    def __pt_container__(self):
+        return self.dialog
 
 
 class TextInputDialog:
@@ -116,50 +95,66 @@ class TextInputDialog:
         return self.dialog
 
 
-class MessageDialog:
-    def __init__(self, title, text):
-        self.future = Future()
+class ApplicationState:
+    """
+    Application state.
 
-        def set_done():
-            self.future.set_result(None)
+    For the simplicity, we store this as a global, but better would be to
+    instantiate this as an object and pass at around.
+    """
 
-        ok_button = Button(text="OK", handler=(lambda: set_done()))
+    show_status_bar = True
+    current_path = None
 
-        self.dialog = Dialog(
-            title=title,
-            body=HSplit([Label(text=text)]),
-            buttons=[ok_button],
-            width=D(preferred=80),
-            modal=True,
+
+class TextEditor:
+    def __init__(self) -> None:
+        self.search_toolbar = SearchToolbar()
+        self.body = HSplit(
+            [
+                self.text_field,
+                self.search_toolbar,
+                ConditionalContainer(
+                    content=VSplit(
+                        [
+                            Window(
+                                FormattedTextControl(self.get_statusbar_text), style="class:status"
+                            ),
+                            Window(
+                                FormattedTextControl(self.get_statusbar_right_text),
+                                style="class:status.right",
+                                width=9,
+                                align=WindowAlign.RIGHT,
+                            ),
+                        ],
+                        height=1,
+                    ),
+                    filter=Condition(lambda: ApplicationState.show_status_bar),
+                ),
+            ]
+        )
+        self.text_field = TextArea(
+            lexer=DynamicLexer(
+                lambda: PygmentsLexer.from_filename(
+                    ApplicationState.current_path or ".txt", sync_from_start=False
+                )
+            ),
+            scrollbar=True,
+            line_numbers=True,
+            search_field=self.search_toolbar,
         )
 
-    def __pt_container__(self):
-        return self.dialog
+    def get_statusbar_right_text(self):
+        return " {}:{}  ".format(
+            self.text_field.document.cursor_position_row + 1,
+            self.text_field.document.cursor_position_col + 1,
+        )
+
+    def get_statusbar_text(self):
+        return " Press Ctrl-C to open menu; Ctrl-T to exit"
 
 
-body = HSplit(
-    [
-        text_field,
-        search_toolbar,
-        ConditionalContainer(
-            content=VSplit(
-                [
-                    Window(
-                        FormattedTextControl(get_statusbar_text), style="class:status"
-                    ),
-                    Window(
-                        FormattedTextControl(get_statusbar_right_text),
-                        style="class:status.right",
-                        width=9,
-                        align=WindowAlign.RIGHT,
-                    ),
-                ],
-                height=1,
-            ),
-            filter=Condition(lambda: ApplicationState.show_status_bar),
-        ),
-    ]
-)
+
 
 
 # Global key bindings.
@@ -171,9 +166,11 @@ def _(event):
     "Focus menu."
     event.app.layout.focus(root_container.window)
 
+
 @bindings.add("c-t")
 def __(event):
     do_exit()
+
 
 #
 # Handlers for menu items.
@@ -202,7 +199,9 @@ def do_open_file():
 
 
 def do_about():
-    show_message("About", "Text editor demo. For more information go to https://github.com/")
+    show_message(
+        "About", "Text editor demo. For more information go to https://github.com/"
+    )
 
 
 def show_message(title, text):
@@ -320,11 +319,11 @@ root_container = MenuContainer(
         MenuItem(
             "Options",
             children=[
-                #MenuItem("New...", handler=do_new_file),
-                #MenuItem("Open...", handler=do_open_file),
-                #MenuItem("Save"),
-                #MenuItem("Save as..."),
-                #MenuItem("-", disabled=True),
+                # MenuItem("New...", handler=do_new_file),
+                # MenuItem("Open...", handler=do_open_file),
+                # MenuItem("Save"),
+                # MenuItem("Save as..."),
+                # MenuItem("-", disabled=True),
                 MenuItem("Exit", handler=do_exit),
             ],
         ),
@@ -385,12 +384,11 @@ application = Application(
 )
 
 
-def run(default_txt = '', path=""):
+def run(default_txt="", path=""):
     if os.path.isfile(path):
         with open(path, "r") as f:
             text_field.text = f.read()
     application.run()
-    
 
 
 if __name__ == "__main__":
