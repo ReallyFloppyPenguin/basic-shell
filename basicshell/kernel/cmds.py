@@ -5,6 +5,7 @@ from ..kernel import utils
 import version
 from shutil import rmtree
 from os import mkdir, remove, path, walk, getcwd
+import sys
 import os
 import platform
 from pathlib import Path
@@ -15,16 +16,16 @@ cmds = [
 ]
 
 def stop(cmd_set_seq, instance):
-    quit()
+    sys.exit()
 
 def cd(cmd_set_seq, instance):
     """`instance` must be of type Shell"""
     if instance.cd:
         try:
-            p =  version.path+instance.cd+'\\'+cmd_set_seq[1]
+            p =  instance.cd+'\\'+cmd_set_seq[1]
             if cmd_set_seq[1] == '../':
                 back_p = Parse().parse(instance.cd, sep='\\')[0]
-                cd_into_back_p = version.path+back_p
+                cd_into_back_p = os.path.dirname(instance.cd)
                 if not back_p:
                     return instance.cd
                     
@@ -142,7 +143,7 @@ def new(cmd_set_seq, instance):
     if instance.cd:
         try:
             if len(path.splitext(cmd_set_seq[1])[1]) >= 1:
-                p = version.path+instance.cd+'\\'+cmd_set_seq[1]
+                p = instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     with open(p, 'x') as tempf:
                         pass
@@ -232,7 +233,7 @@ def arth(cmd_set_seq, instance):
         instance.pipe.stdout(e)
 
 def lidir(cmd_set_seq, instance):
-    p = version.path+instance.cd+'\\'
+    p = instance.cd
     instance.pipe.stdout(f'Inside {p}')
     for file in os.listdir(p):
         instance.pipe.stdout('--'+file)

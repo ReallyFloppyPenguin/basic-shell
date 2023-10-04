@@ -8,7 +8,7 @@ from typing import Optional, List, TypeVar
 from ..tools import pipes
 
 
-def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
+def call_cmd(cmd_set_seq, instance, cmds: str) -> List[str]:
     try:
         try:
             is_special = cmds[2]
@@ -38,6 +38,7 @@ def call_cmd(cmd_set_seq, instance, cmds: str) -> Optional[List[str]]:
 
     except FileNotFoundError:
         print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
+        return "ERROR", "ERROR"
 
 
 class Shell:
@@ -66,7 +67,7 @@ class Shell:
             raise pipes.PipeError(
                 f"Pipe must be of type BasePipe, not {pipe.__class__.__name__}"
             )
-        self.cd: str = "root"
+        self.cd: str = version.path
         self.data_j: str = data_j
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
@@ -86,7 +87,8 @@ class Shell:
             "help": help,
             "edit": edit,
             "arth": arth,
-            "clear": clear
+            "clear": clear,
+            "reload": self.reload
         }
         try:
             if not self.json["user"]["username"]:
@@ -127,6 +129,8 @@ class Shell:
             if cmd_set_seq[0] == 'cd':
                 c_d = call(cmd_set_seq, self)
                 self.reload(c_d)
+            if cmd_set_seq[0] == 'reload':
+                call(self.cd)
             else:
                 call(cmd_set_seq, self)
         else:
@@ -147,7 +151,7 @@ class Shell:
         try:
             with open(path, "r") as tempf:
                 data = l(tempf)
-        except:
+        except FileNotFoundError:
             if rebuild:
                 temp_path = open(path, "x")
                 temp_path.write(r"{}")
@@ -165,7 +169,8 @@ class Shell:
 
     def reload(self, cd):
         self.cd = cd
-        self.json = self._load(self.data_j)
+        self.json = self._load(self.data_j, False)
+        self.call = self._load(self.data_c, False)
         try:
             if not self.json["user"]["username"]:
                 self._create_user()
