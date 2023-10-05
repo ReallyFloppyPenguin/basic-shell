@@ -100,7 +100,6 @@ class Shell:
         self._username = self.json["user"]["username"]
         self._passw = self.json["user"]["password"]
         self.inp_start = f"{self._username}@{self.cd}$ "
-        self._jp = data_j.encode("utf-8")
         clear([], self)
 
     def _create_user(self):
@@ -163,11 +162,13 @@ class Shell:
         return data
     
     def _init_data_c(self):
-        with open(self.data_c, 'r') as tempf:
-            data_c = l(tempf)
-            if not data_c.get('cmds'):
-                temp_copy = copy.deepcopy(data_c)
-                temp_copy['cmds'] = []
+        data_c = self._load(self.data_c)
+        print(data_c, data_c.get('cmds'))
+        if data_c.get('cmds') is None:
+            temp_copy = copy.deepcopy(data_c)
+            temp_copy['cmds'] = []
+            self._dump(temp_copy, self.data_c)
+                
 
     def _dump(self, data: dict, path: str):
         with open(path, "w") as tempf:

@@ -151,7 +151,7 @@ def new(cmd_set_seq, instance):
                     instance.pipe.stdout(ERROR, FILE_EXISTS, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                     'Cannot create new file')
             else:
-                p = version.path+instance.cd+'\\'+cmd_set_seq[1]
+                p = instance.cd+'\\'+cmd_set_seq[1]
                 try:
                     Path(p).mkdir()
                 except FileExistsError:
