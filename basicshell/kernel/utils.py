@@ -6,6 +6,7 @@ from ..tools.error import ERROR, INVALID_CMD, QUOTE
 from subprocess import Popen, PIPE
 from typing import Optional, List, TypeVar
 from ..tools import pipes
+import copy
 
 
 def call_cmd(cmd_set_seq, instance, cmds: str) -> List[str]:
@@ -72,6 +73,7 @@ class Shell:
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
         self.call = self._load(self.data_c)
+        self._init_data_c()
         self.cmds_to_call_default_set = {
             "cd": cd,
             "lidir": lidir,
@@ -159,6 +161,13 @@ class Shell:
             else:
                 raise FileNotFoundError
         return data
+    
+    def _init_data_c(self):
+        with open(self.data_c, 'r') as tempf:
+            data_c = l(tempf)
+            if not data_c.get('cmds'):
+                temp_copy = copy.deepcopy(data_c)
+                temp_copy['cmds'] = []
 
     def _dump(self, data: dict, path: str):
         with open(path, "w") as tempf:
