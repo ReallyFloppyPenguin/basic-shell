@@ -24,12 +24,11 @@ def cd(cmd_set_seq, instance):
         try:
             p =  instance.cd+'\\'+cmd_set_seq[1]
             if cmd_set_seq[1] == '../':
-                back_p = Parse().parse(instance.cd, sep='\\')[0]
-                cd_into_back_p = os.path.dirname(instance.cd)
+                back_p = Path(instance.cd).parent.absolute().__str__()
                 if not back_p:
                     return instance.cd
                     
-                if path.isdir(cd_into_back_p):
+                if path.isdir(back_p):
                     return f'{back_p}'
                 else:
                     instance.pipe.stdout(ERROR, DIR_NOT_FOUND, back_p+'.', 
@@ -39,6 +38,7 @@ def cd(cmd_set_seq, instance):
             if path.isdir(p):
                 return f'{instance.cd}\\{cmd_set_seq[1]}'
             else:
+                print('called')
                 instance.pipe.stdout(ERROR, DIR_NOT_FOUND, instance.cd+'\\'+cmd_set_seq[1]+'.', 
                 'Cannot cd into dir')
                 return instance.cd

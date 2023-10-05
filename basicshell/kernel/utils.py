@@ -122,10 +122,8 @@ class Shell:
 
     def _handle(self, inp):
         cmd_set_seq = Parse().parse(inp.strip())
-        print(cmd_set_seq[0])
         call = self.cmds_to_call_default_set.get(cmd_set_seq[0])
         if call is not None:
-            print('oj')
             if cmd_set_seq[0] == 'cd':
                 c_d = call(cmd_set_seq, self)
                 self.reload(c_d)
