@@ -10,7 +10,7 @@ class BasePipe:
     def stdout(self, *out) -> None:
         if not isinstance(out, list):
             out = ' '.join(out)
-        print(out, 'aaaa')
+        print(out)
 
 class DefaultPipe(BasePipe):
     def __init__(self):

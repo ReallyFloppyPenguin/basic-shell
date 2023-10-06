@@ -223,6 +223,10 @@ class TextEditor:
         @bindings.add("c-t")
         def __(event):
             self.do_exit()
+
+        @bindings.add("c-z")
+        def ___(event):
+            self.do_undo()
     
     def get_statusbar_right_text(self):
         return " {}:{}  ".format(

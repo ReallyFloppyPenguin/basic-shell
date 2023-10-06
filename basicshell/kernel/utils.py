@@ -17,12 +17,12 @@ def call_cmd(cmd_set_seq, instance, cmds: str) -> List[str]:
             is_special = False
 
         modified_cmd_list = []
-        #print("----------------------------------------------------------------")
-        #print(1, len(cmds))
+        #self.pipe.stdout("----------------------------------------------------------------")
+        #self.pipe.stdout(1, len(cmds))
 
         for i in range(1, len(cmd_set_seq)):
-            #print("replace", i)
-            #print(cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}'))
+            #self.pipe.stdout("replace", i)
+            #self.pipe.stdout(cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}'))
             modified_cmd_list.append(
                 cmds[1].replace(f"*{i}*", f'{cmd_set_seq[i].replace("*", "")}')
             )
@@ -38,7 +38,7 @@ def call_cmd(cmd_set_seq, instance, cmds: str) -> List[str]:
             return stdout.decode(), stderr.decode()
 
     except FileNotFoundError:
-        print(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
+        instance.pipe.stdout(ERROR, INVALID_CMD, QUOTE + cmd + QUOTE)
         return "ERROR", "ERROR"
 
 
@@ -104,7 +104,7 @@ class Shell:
         clear([], self)
 
     def _create_user(self):
-        print("Please fill this form to create a user")
+        self.pipe.stdout("Please fill this form to create a user")
 
         _username = input("Username: ")
         _passw = input("Password (it will be hashed): ")
@@ -138,11 +138,11 @@ class Shell:
             if cmd is not None:
                 out, err = call_cmd(cmd_set_seq, self, cmd)
                 if out:
-                    print("OUTPUT", "\n", out)
+                    self.pipe.stdout("OUTPUT", "\n", out)
                 else:
-                    print("ERROR", "\n", err)
+                    self.pipe.stdout("ERROR", "\n", err)
             else:
-                print(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
+                self.pipe.stdout(ERROR, INVALID_CMD, QUOTE + cmd_set_seq[0] + QUOTE)
 
         self.reload(self.cd)
         
@@ -164,7 +164,6 @@ class Shell:
     
     def _init_data_c(self):
         data_c = self._load(self.data_c)
-        print(data_c, data_c.get('cmds'))
         if data_c.get('cmds') is None:
             temp_copy = copy.deepcopy(data_c)
             temp_copy['cmds'] = []
@@ -210,7 +209,7 @@ class Shell:
                 except:
                     return [cmd[0], cmd[1], False]
         # if has_found_command == False:
-        ##    print("nah")
+        ##    self.pipe.stdout("nah")
         #    return None
 
     def __delattr__(self, __name: str) -> None:

@@ -56,7 +56,6 @@ def cd(cmd_set_seq, instance):
             if path.isdir(p):
                 return f"{instance.cd}\\{cmd_set_seq[1]}"
             else:
-                print("called")
                 instance.pipe.stdout(
                     ERROR,
                     DIR_NOT_FOUND,
@@ -176,19 +175,19 @@ def run_py_exe(cmd_set_seq, instance):
         spec = importlib.util.spec_from_file_location(
             cmd_set_seq[1], instance.cd+'\\'+cmd_set_seq[1]
         )
-
-        # importing the module as foo
+        exe = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(exe)
         try:
-            exe = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(exe)
+            
+            
             params = []
             for i, param in enumerate(cmd_set_seq[2:]):
                 params.append(param.replace('*', ''))
             exe.run(*params, instance=instance)
         except:
-            print('your file has an error')
+            instance.pipe.stdout(ERROR, PARSING_EXE)
     except AttributeError:
-        print('err')
+        instance.pipe.stdout(ERROR, FILE_NOT_FOUND, cmd_set_seq[1])
 
 
 def new(cmd_set_seq, instance):
@@ -244,7 +243,6 @@ def dlete(cmd_set_seq, instance):
 
 def edit(cmd_set_seq, instance):
     text_ed = text_editor.TextEditor()
-    print(cmd_set_seq[1])
     text_ed.run(path=cmd_set_seq[1])
 
 
