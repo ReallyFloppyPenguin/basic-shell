@@ -11,7 +11,7 @@ FILE_EXISTS = 'File exists:'
 FILE_NOT_FOUND = 'File not found:'
 DIR_NOT_FOUND = 'Dir not found:'
 CANNOT_EDIT = 'Cannot edit'
-
+PARSING_EXE = ''
 
 class ShellInstanceError(Exception):
     pass

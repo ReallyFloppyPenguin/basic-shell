@@ -90,6 +90,7 @@ class Shell:
             "edit": edit,
             "arth": arth,
             "clear": clear,
+            "run": run_py_exe,
             "reload": self.reload
         }
         try:
