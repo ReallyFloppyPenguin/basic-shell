@@ -1,12 +1,13 @@
-from ..tools.error import *
-from ..tools.parser import Parse
+from basicshell.tools.error import *
+from basicshell.tools.parser import Parse
 from hashlib import sha256
-from ..kernel import utils
+import basicshell.kernel.utils
 import version
 from shutil import rmtree
-from os import mkdir, remove, path, walk, getcwd
+from os import mkdir, remove, path, walk, getcwd, chdir
 import sys
 import os
+import webbrowser
 import platform
 import importlib.util
 from pathlib import Path
@@ -37,7 +38,19 @@ def stop(cmd_set_seq, instance):
 
 def cd(cmd_set_seq, instance):
     """`instance` must be of type Shell"""
-    if instance.cd:
+    if instance.cd:  #
+        chdir(os.getcwd() + f"\\{cmd_set_seq[1]}")
+        return os.getcwd()
+    else:
+        raise ShellInstanceError(FATAL_ERR, instance, IS_NOT, OF_TYPE, SHELL)
+
+
+def _cd(cmd_set_seq, instance):
+    """`instance` must be of type Shell"""
+    if instance.cd:  #
+        cwd = Path(instance.cd).parent.absolute().__str__()
+        chdir(cwd + f"\\{cmd_set_seq[1]}")
+        print(os.getcwd())
         try:
             p = instance.cd + "\\" + cmd_set_seq[1]
             if cmd_set_seq[1] == "../":
@@ -54,6 +67,7 @@ def cd(cmd_set_seq, instance):
                     return instance.cd
 
             if path.isdir(p):
+                return os.getcwd()
                 return f"{instance.cd}\\{cmd_set_seq[1]}"
             else:
                 instance.pipe.stdout(
@@ -172,17 +186,19 @@ def dlenv(cmd_set_seq, instance):
 
 def run_py_exe(cmd_set_seq, instance):
     try:
+        cmd_set_seq[1] = cmd_set_seq[1].replace(".py", '')
         spec = importlib.util.spec_from_file_location(
-            cmd_set_seq[1], instance.cd+'\\'+cmd_set_seq[1]
+            cmd_set_seq[1], instance.cd + "\\" + cmd_set_seq[1]+".py"
         )
         exe = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(exe)
         try:
-            
-            
             params = []
             for i, param in enumerate(cmd_set_seq[2:]):
-                params.append(param.replace('*', ''))
+                params.append(param.replace("*", ""))
+            instance.pipe.stdout(
+                f"Running application '{cmd_set_seq[1]}' with {len(params)} params"
+            )
             exe.run(*params, instance=instance)
         except:
             instance.pipe.stdout(ERROR, PARSING_EXE)
@@ -283,11 +299,11 @@ def _edit(cmd_set_seq, instance):
 def help(cmd_set_seq, instance):
     try:
         if cmd_set_seq[1] in cmds:
-            instance.pipe.stdout(
-                "Find help here:", version.github_link + "/wiki/" + "Commands/"
+            webbrowser.open(
+                f"https://github.com/potato-pack/basic-shell/wiki/Commands#{cmd_set_seq[1]}"
             )
     except:
-        instance.pipe.stdout(ERROR, MISSING_ARG)
+        webbrowser.open(f"https://github.com/potato-pack/basic-shell/wiki/Commands")
 
 
 def clear(cmd_set_seq, instance):

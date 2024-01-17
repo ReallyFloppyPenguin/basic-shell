@@ -1,12 +1,13 @@
 from hashlib import sha256
 from json import load as l, dump as d
-from ..tools.parser import Parse
-from .cmds import *
-from ..tools.error import ERROR, INVALID_CMD, QUOTE
+from basicshell.tools.parser import Parse
+from basicshell.kernel.cmds import *
+from basicshell.tools.error import ERROR, INVALID_CMD, QUOTE
 from subprocess import Popen, PIPE
-from typing import Optional, List, TypeVar
-from ..tools import pipes
+from typing import List
+from basicshell.tools import pipes
 import copy
+from pwinput import pwinput
 
 
 def call_cmd(cmd_set_seq, instance, cmds: str) -> List[str]:
@@ -68,7 +69,8 @@ class Shell:
             raise pipes.PipeError(
                 f"Pipe must be of type BasePipe, not {pipe.__class__.__name__}"
             )
-        self.cd: str = version.path
+        print(os.getcwd())
+        self.cd: str = os.getcwd()
         self.data_j: str = data_j
         self.data_c: str = data_c
         self.json = self._load(self.data_j)
@@ -102,12 +104,21 @@ class Shell:
         self._passw = self.json["user"]["password"]
         self.inp_start = f"{self._username}@{self.cd}$ "
         clear([], self)
+        self._print_info()
+
+
+    def _print_info(self):
+        print("+-------------------------------+")
+        print("|-----Welcome to basicshell-----|")
+        print(f"|-------------{version.version}-------------|")
+        print("+-------------------------------+")
+
 
     def _create_user(self):
         self.pipe.stdout("Please fill this form to create a user")
 
         _username = input("Username: ")
-        _passw = input("Password (it will be hashed): ")
+        _passw = pwinput("Password (it will be hashed): ")
         data_to_dump = {
             "user": {
                 "username": _username,
@@ -201,13 +212,15 @@ class Shell:
         ```
         """
         has_found_command = False
-        for cmd in self.call["cmds"]:
-            if cmd_set_seq[0] == cmd[0][0]:
-                # has_found_command = True
-                try:
-                    return [cmd[0], cmd[1], cmd[2]]
-                except:
-                    return [cmd[0], cmd[1], False]
+        try:
+            for cmd in self.call["cmds"]:
+                if cmd_set_seq[0] == cmd[0][0]:
+                    # has_found_command = True
+                    try:
+                        return [cmd[0], cmd[1], cmd[2]]
+                    except:
+                        return [cmd[0], cmd[1], False]
+        except:pass
         # if has_found_command == False:
         ##    self.pipe.stdout("nah")
         #    return None
