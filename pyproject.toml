@@ -1,0 +1,41 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "basicshell"
+version = "0.0.1"
+description = "A basic shell"
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["shell"]
+dependencies = [
+    "click",
+    "prompt_toolkit",
+    'pwinput',
+    'colorama', 
+    'datetime',
+    'asyncio',
+    'importlib',
+    'platform',
+    'webbrowser',
+    'shutil',
+    'hashlib',
+    'json',
+    'subprocess',
+    'typing',
+    'pyttsx3'
+]
+
+[project.urls]
+Homepage = "https://github.com/potato-pack/basic-shell/"
+
+[project.scripts]
+realpython = "basicshell.__main__:main"
