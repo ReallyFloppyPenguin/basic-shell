@@ -27,7 +27,7 @@ Here's the [wiki](https://github.com/potato-pack/basic-shell/wiki)
 
 ## Basic Documentation
   First, install it.
-  `pip install basic-shell`
+  `pip install basicshell`
 
   ```
   import basicshell
