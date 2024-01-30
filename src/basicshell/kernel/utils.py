@@ -64,7 +64,6 @@ class Shell:
             raise pipes.PipeError(
                 f"Pipe must be of type BasePipe, not {pipe.__class__.__name__}"
             )
-        print(os.getcwd())
         self.cd = os.getcwd()
         if data_j is None:
             self.data_j = os.getcwd() + "\\data_j.json"
